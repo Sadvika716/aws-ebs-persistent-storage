@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Amazon EBS Persistent Storage Lab
+
+# 1. View available disks
+lsblk
+df -h
+
+# 2. After attaching the EBS volume,
+# identify its actual device name using lsblk.
+# Set DEVICE to the correct empty disk.
+# Example only: DEVICE=/dev/nvme1n1
+
+# 3. Format the original volume ONLY after
+# verifying that DEVICE is the correct empty disk.
+# sudo mkfs -t ext3 "$DEVICE"
+
+# 4. Create the mount directory
+sudo mkdir -p /mnt/data-store
+
+# 5. Mount the original EBS volume
+# sudo mount "$DEVICE" /mnt/data-store
+
+# 6. Create a test file
+# sudo sh -c 'echo "EBS persistence test" > /mnt/data-store/file.txt'
+
+# 7. Verify the file
+# cat /mnt/data-store/file.txt
+
+# 8. Create a snapshot using the AWS Console.
+# Wait for the snapshot state to become Completed.
+
+# 9. Delete the original file after snapshot completion
+# sudo rm /mnt/data-store/file.txt
+
+# 10. Attach a volume created from the snapshot.
+# Identify the restored device with lsblk.
+
+# 11. Mount the restored volume
+# sudo mkdir -p /mnt/data-store2
+# sudo mount /dev/ACTUAL_RESTORED_DEVICE /mnt/data-store2
+
+# 12. Verify the recovered file
+# ls -l /mnt/data-store2/
+# cat /mnt/data-store2/file.txt
