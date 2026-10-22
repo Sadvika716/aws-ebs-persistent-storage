@@ -1,0 +1,113 @@
+# aws-ebs-persistent-storage
+Create, attach, configure, snapshot, and restore Amazon EBS volumes using EC2 and Linux.
+# Manage Persistent Storage Using Amazon EBS
+
+## Aim
+To create, attach, configure, snapshot, and restore Amazon
+Elastic Block Store (EBS) volumes for persistent storage
+with an Amazon EC2 instance.
+
+## Requirements
+- AWS account with access to EC2 and EBS
+- A running EC2 Linux lab instance
+- Basic Linux command knowledge
+- EC2 instance and EBS volume in the same Availability Zone
+
+## Architecture
+
+EC2 Instance
+    |
+    +-- Original EBS Volume (1 GiB, gp2)
+    |       |
+    |       +-- /mnt/data-store
+    |               |
+    |               +-- file.txt
+    |
+    +-- EBS Snapshot
+            |
+            +-- Restored EBS Volume
+                    |
+                    +-- /mnt/data-store2
+                            |
+                            +-- file.txt
+
+## Task 1: Create an EBS Volume
+1. Open AWS Console and navigate to EC2 > Volumes.
+2. Click Create volume.
+3. Select General Purpose SSD (gp2).
+4. Set the size to 1 GiB.
+5. Select the same Availability Zone as the lab instance.
+6. Add the tag Name=My Volume.
+7. Click Create volume.
+
+## Task 2: Attach the Volume
+1. Select My Volume.
+2. Choose Actions > Attach volume.
+3. Select the lab EC2 instance.
+4. Select an available device name, such as /dev/sdf.
+5. Click Attach volume.
+
+Note: Linux device names can differ from the requested
+EC2 device name. Identify the actual device with lsblk.
+
+## Task 3: Connect to EC2
+1. Open EC2 > Instances.
+2. Select the lab instance and click Connect.
+3. Use EC2 Instance Connect.
+
+## Task 4: Configure the File System
+1. Inspect available disks using lsblk.
+2. Identify the newly attached, empty EBS disk.
+3. Create an ext3 filesystem on the correct device.
+4. Create /mnt/data-store.
+5. Mount the volume.
+6. Configure automatic mounting using the filesystem UUID.
+7. Verify the mount and create file.txt.
+
+See ebs-commands.sh for the commands.
+
+WARNING: Formatting a disk destroys existing filesystem
+data. Never run mkfs on the root disk or an existing disk.
+
+## Task 5: Create a Snapshot
+1. Navigate to EC2 > Volumes.
+2. Select My Volume.
+3. Choose Actions > Create snapshot.
+4. Set the snapshot Name tag to My Snapshot.
+5. Wait for the snapshot status to become Completed.
+6. Delete file.txt from the original mounted volume.
+7. Verify that the file is absent from the original volume.
+
+## Task 6: Restore from the Snapshot
+1. Navigate to EC2 > Snapshots.
+2. Select My Snapshot.
+3. Choose Actions > Create volume from snapshot.
+4. Select the same Availability Zone as the EC2 instance.
+5. Add the tag Name=Restored Volume.
+6. Attach the new volume to the lab instance.
+7. Identify the restored device using lsblk.
+8. Mount it at /mnt/data-store2.
+9. Verify that file.txt exists on the restored volume.
+
+## Expected Result
+The original volume stores file.txt. After creating a snapshot
+and deleting the original file, a volume created from that
+snapshot contains the original file again.
+
+## Important Notes
+- An EBS volume must be in the same Availability Zone as
+  the EC2 instance to attach to it.
+- EC2 device names such as /dev/sdf and /dev/sdg may appear
+  as /dev/nvme... on Nitro-based instances.
+- Use filesystem UUIDs in /etc/fstab for reliable mounting.
+- Snapshots and volumes may incur AWS charges.
+- Delete lab resources after completing the experiment.
+
+## Evidence
+Add screenshots to the screenshots/ folder:
+1. Created EBS volume
+2. Volume attached to EC2
+3. Filesystem and mount verification
+4. Snapshot completed
+5. Original file deleted
+6. Restored file verified
